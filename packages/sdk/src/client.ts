@@ -3,24 +3,10 @@
  *
  * Usage:
  *   const kz = new Katzilla({ apiKey: "kz_abc123" });
- *   const payment = await kz.stripe.createPaymentIntent({ amount: 2000 });
+ *   const quakes = await kz.agent("data-hazards").action("recent-earthquakes", { minMagnitude: 5 });
  */
 
 import type { KatzillaResponse, KatzillaError } from "./types.js";
-import { StripeAgent } from "./agents/stripe.js";
-import { SendGridAgent } from "./agents/sendgrid.js";
-import { SupabaseAgent } from "./agents/supabase.js";
-import { S3Agent } from "./agents/s3.js";
-import { GitHubAgent } from "./agents/github.js";
-import { SlackAgent } from "./agents/slack.js";
-import { NotionAgent } from "./agents/notion.js";
-import { SheetsAgent } from "./agents/sheets.js";
-import { CloudflareAgent } from "./agents/cloudflare.js";
-import { OpenAIAgent } from "./agents/openai.js";
-import { PostHogAgent } from "./agents/posthog.js";
-import { SentryAgent } from "./agents/sentry.js";
-import { TwilioAgent } from "./agents/twilio.js";
-import { UptimeAgent } from "./agents/uptime.js";
 
 export interface KatzillaOptions {
   /** API key (starts with kz_) */
@@ -43,46 +29,15 @@ export class Katzilla {
   private apiKey: string;
   private baseUrl: string;
 
-  // ── Typed agent sub-clients ──────────────────────────────────
-  readonly stripe: StripeAgent;
-  readonly sendgrid: SendGridAgent;
-  readonly supabase: SupabaseAgent;
-  readonly s3: S3Agent;
-  readonly github: GitHubAgent;
-  readonly slack: SlackAgent;
-  readonly notion: NotionAgent;
-  readonly sheets: SheetsAgent;
-  readonly cloudflare: CloudflareAgent;
-  readonly openai: OpenAIAgent;
-  readonly posthog: PostHogAgent;
-  readonly sentry: SentryAgent;
-  readonly twilio: TwilioAgent;
-  readonly uptime: UptimeAgent;
-
   constructor(options: KatzillaOptions) {
     this.apiKey = options.apiKey;
     this.baseUrl = (options.baseUrl || "https://api.katzilla.dev").replace(/\/$/, "");
-
-    this.stripe = new StripeAgent(this);
-    this.sendgrid = new SendGridAgent(this);
-    this.supabase = new SupabaseAgent(this);
-    this.s3 = new S3Agent(this);
-    this.github = new GitHubAgent(this);
-    this.slack = new SlackAgent(this);
-    this.notion = new NotionAgent(this);
-    this.sheets = new SheetsAgent(this);
-    this.cloudflare = new CloudflareAgent(this);
-    this.openai = new OpenAIAgent(this);
-    this.posthog = new PostHogAgent(this);
-    this.sentry = new SentryAgent(this);
-    this.twilio = new TwilioAgent(this);
-    this.uptime = new UptimeAgent(this);
   }
 
   /**
-   * Execute an agent action (dynamic/untyped).
+   * Execute a data agent action.
    *
-   *   const result = await kz.agent("stripe").action("create-payment-intent", { amount: 2000 });
+   *   const result = await kz.agent("data-hazards").action("recent-earthquakes", { minMagnitude: 5 });
    */
   agent(handle: string) {
     return {
@@ -92,7 +47,7 @@ export class Katzilla {
   }
 
   /**
-   * Low-level execute method. All typed sub-clients delegate here.
+   * Low-level execute method.
    */
   async execute<T = Record<string, unknown>>(
     agentHandle: string,

@@ -21,8 +21,8 @@
   },
   "files": ["dist", "README.md"],
   "license": "MIT",
-  "description": "Official TypeScript SDK for the Katzilla API — one connection, every API.",
-  "keywords": ["katzilla", "api", "agents", "stripe", "sendgrid", "github", "sdk"],
+  "description": "Official TypeScript SDK for the Katzilla Data API — free OSINT & public data.",
+  "keywords": ["katzilla", "api", "data", "osint", "government", "sdk"],
   "repository": {
     "type": "git",
     "url": "https://github.com/codeislaw101/katzilla"
