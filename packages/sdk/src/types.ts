@@ -3,359 +3,31 @@
  * These mirror the Zod schemas defined in each agent package.
  */
 
-// ── Stripe ────────────────────────────────────────────────────
+// ── Quality & Citation Metadata ────────────────────────────────
 
-export interface CreatePaymentIntentInput {
-  amount: number;
-  currency?: string;
-  customerId?: string;
-  description?: string;
-  metadata?: Record<string, string>;
+export interface QualityMeta {
+  freshness_seconds: number;
+  source_uptime_7d: number | null;
+  last_verified: string | null;
+  data_completeness: number;
+  confidence: "high" | "medium" | "low";
 }
 
-export interface CreateCheckoutSessionInput {
-  lineItems: Array<{
-    priceId?: string;
-    name?: string;
-    amount?: number;
-    currency?: string;
-    quantity?: number;
-  }>;
-  successUrl: string;
-  cancelUrl: string;
-  mode?: "payment" | "subscription" | "setup";
-  customerEmail?: string;
+export interface CitationBlock {
+  source_name: string;
+  source_url: string;
+  retrieved_at: string;
+  data_hash: string;
+  license: string;
 }
 
-export interface CreateRefundInput {
-  paymentIntentId: string;
-  amount?: number;
-  reason?: "duplicate" | "fraudulent" | "requested_by_customer";
-}
+// ── Token Optimization (response shaping) ────────────────────
 
-export interface CreateCustomerInput {
-  email: string;
-  name?: string;
-  phone?: string;
-  metadata?: Record<string, string>;
-}
-
-export interface ListPaymentsInput {
-  customerId?: string;
-  limit?: number;
-}
-
-// ── SendGrid ──────────────────────────────────────────────────
-
-export interface SendEmailInput {
-  to: string | string[];
-  from: string;
-  subject: string;
-  text?: string;
-  html?: string;
-  cc?: string | string[];
-  bcc?: string | string[];
-}
-
-export interface SendTemplateInput {
-  to: string | string[];
-  from: string;
-  templateId: string;
-  dynamicData?: Record<string, unknown>;
-}
-
-export interface AddContactInput {
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  listIds?: string[];
-}
-
-// ── Supabase ──────────────────────────────────────────────────
-
-export interface SupabaseQueryInput {
-  table: string;
-  select?: string;
-  filters?: Array<{
-    column: string;
-    operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "ilike" | "in" | "is";
-    value: unknown;
-  }>;
-  limit?: number;
-  order?: { column: string; ascending?: boolean };
-}
-
-export interface SupabaseInsertInput {
-  table: string;
-  rows: Array<Record<string, unknown>>;
-}
-
-export interface SupabaseUploadInput {
-  bucket: string;
-  path: string;
-  content: string;
-  contentType?: string;
-}
-
-export interface SupabaseAuthSignupInput {
-  email: string;
-  password: string;
-}
-
-// ── S3 ────────────────────────────────────────────────────────
-
-export interface PutObjectInput {
-  bucket: string;
-  key: string;
-  body: string;
-  contentType?: string;
-}
-
-export interface GetObjectInput {
-  bucket: string;
-  key: string;
-}
-
-export interface ListObjectsInput {
-  bucket: string;
-  prefix?: string;
-  maxKeys?: number;
-}
-
-export interface PresignUrlInput {
-  bucket: string;
-  key: string;
-  expiresIn?: number;
-  method?: "get" | "put";
-}
-
-// ── GitHub ─────────────────────────────────────────────────────
-
-export interface CreateIssueInput {
-  owner: string;
-  repo: string;
-  title: string;
-  body?: string;
-  labels?: string[];
-  assignees?: string[];
-}
-
-export interface CreatePrInput {
-  owner: string;
-  repo: string;
-  title: string;
-  body?: string;
-  head: string;
-  base?: string;
-}
-
-export interface ListReposInput {
-  owner: string;
-  type?: "all" | "owner" | "member";
-  sort?: "created" | "updated" | "pushed" | "full_name";
-  limit?: number;
-}
-
-export interface GetFileInput {
-  owner: string;
-  repo: string;
-  path: string;
-  ref?: string;
-}
-
-export interface CreateCommentInput {
-  owner: string;
-  repo: string;
-  issueNumber: number;
-  body: string;
-}
-
-// ── Slack ──────────────────────────────────────────────────────
-
-export interface SendMessageInput {
-  channel: string;
-  text: string;
-  blocks?: Array<Record<string, unknown>>;
-}
-
-export interface CreateChannelInput {
-  name: string;
-  isPrivate?: boolean;
-}
-
-export interface ListChannelsInput {
-  limit?: number;
-  types?: string;
-}
-
-export interface UploadFileInput {
-  channels: string;
-  content: string;
-  filename?: string;
-  title?: string;
-}
-
-// ── Notion ─────────────────────────────────────────────────────
-
-export interface CreatePageInput {
-  databaseId: string;
-  properties: Record<string, unknown>;
-  content?: string;
-}
-
-export interface QueryDatabaseInput {
-  databaseId: string;
-  filter?: Record<string, unknown>;
-  sorts?: Array<Record<string, unknown>>;
-  limit?: number;
-}
-
-export interface UpdatePageInput {
-  pageId: string;
-  properties: Record<string, unknown>;
-}
-
-export interface NotionSearchInput {
-  query: string;
-  filterType?: "page" | "database";
-  limit?: number;
-}
-
-// ── Google Sheets ──────────────────────────────────────────────
-
-export interface ReadRangeInput {
-  spreadsheetId: string;
-  range: string;
-}
-
-export interface WriteRangeInput {
-  spreadsheetId: string;
-  range: string;
-  values: Array<Array<string | number | boolean | null>>;
-}
-
-export interface AppendRowInput {
-  spreadsheetId: string;
-  range: string;
-  values: Array<string | number | boolean | null>;
-}
-
-export interface CreateSheetInput {
-  title: string;
-}
-
-// ── OpenAI ─────────────────────────────────────────────────────
-
-export interface ChatCompletionInput {
-  model?: string;
-  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
-  temperature?: number;
-  maxTokens?: number;
-}
-
-export interface CreateEmbeddingInput {
-  model?: string;
-  input: string | string[];
-}
-
-export interface CreateImageInput {
-  prompt: string;
-  model?: string;
-  size?: "1024x1024" | "1024x1792" | "1792x1024" | "256x256" | "512x512";
-  quality?: "standard" | "hd";
-}
-
-// ── Twilio ─────────────────────────────────────────────────────
-
-export interface SendSmsInput {
-  to: string;
-  body: string;
-}
-
-export interface SendWhatsappInput {
-  to: string;
-  body: string;
-}
-
-export interface LookupNumberInput {
-  phoneNumber: string;
-}
-
-// ── Cloudflare ─────────────────────────────────────────────────
-
-export interface CreateDnsRecordInput {
-  zoneId: string;
-  type: "A" | "AAAA" | "CNAME" | "MX" | "TXT";
-  name: string;
-  content: string;
-  ttl?: number;
-  proxied?: boolean;
-}
-
-export interface ListZonesInput {
-  name?: string;
-}
-
-export interface PurgeCacheInput {
-  zoneId: string;
-  purgeEverything?: boolean;
-  files?: string[];
-}
-
-// ── PostHog ────────────────────────────────────────────────────
-
-export interface CaptureEventInput {
-  distinctId: string;
-  event: string;
-  properties?: Record<string, unknown>;
-}
-
-export interface GetInsightsInput {
-  events: Array<{ id: string; math?: string }>;
-  dateFrom?: string;
-  dateTo?: string;
-}
-
-export interface FeatureFlagInput {
-  key: string;
-  distinctId: string;
-}
-
-// ── Sentry ─────────────────────────────────────────────────────
-
-export interface SentryListIssuesInput {
-  project: string;
-  query?: string;
-  sort?: "date" | "new" | "priority" | "freq" | "users";
-  limit?: number;
-}
-
-export interface ResolveIssueInput {
-  issueId: string;
-  status: "resolved" | "unresolved" | "ignored";
-}
-
-export interface CreateReleaseInput {
-  project: string;
-  version: string;
-  ref?: string;
-  url?: string;
-}
-
-// ── Uptime ─────────────────────────────────────────────────────
-
-export interface CheckUrlInput {
-  url: string;
-  method?: "GET" | "HEAD" | "POST" | "PUT" | "DELETE";
-  expectedStatus?: number;
-  timeout?: number;
-}
-
-export interface GetStatusInput {
-  url: string;
-  method?: "GET" | "HEAD" | "POST" | "PUT" | "DELETE";
-  expectedStatus?: number;
-  timeout?: number;
+export interface TokenOptimizationParams {
+  _fields?: string[];
+  _format?: "full" | "compact";
+  _limit?: number;
+  _summary?: boolean;
 }
 
 // ── API Response ───────────────────────────────────────────────
@@ -369,8 +41,11 @@ export interface KatzillaResponse<T = Record<string, unknown>> {
     action: string;
     authMethod: string;
     creditsCharged: number;
+    cacheStatus: "hit" | "miss" | "stale";
     durationMs: number;
   };
+  quality: QualityMeta;
+  citation: CitationBlock | null;
 }
 
 export interface KatzillaError {
@@ -378,4 +53,23 @@ export interface KatzillaError {
   details?: Array<{ path: string; message: string }>;
   missing?: Array<{ key: string; label: string; methods: string[] }>;
   hint?: string;
+}
+
+// ── Tool Definition Types ─────────────────────────────────────
+
+export interface KatzillaToolDefinition {
+  name: string;
+  agentHandle: string;
+  actionId: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export interface OpenAIFunctionTool {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
 }

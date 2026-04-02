@@ -10,4 +10,4 @@
 
 export { Katzilla, KatzillaApiError } from "./client.js";
 export type { KatzillaOptions } from "./client.js";
-export type { KatzillaResponse, KatzillaError } from "./types.js";
+export type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool } from "./types.js";

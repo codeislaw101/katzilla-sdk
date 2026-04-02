@@ -1,0 +1,39 @@
+{
+  "name": "@katzilla/ai-sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@katzilla/sdk": "workspace:*"
+  },
+  "peerDependencies": {
+    "ai": ">=3.0.0",
+    "zod": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ai": { "optional": false },
+    "zod": { "optional": false }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ai": "^4.0.0",
+    "typescript": "^5.9.0",
+    "zod": "^3.25.0"
+  },
+  "files": ["dist", "README.md"],
+  "license": "MIT",
+  "description": "Katzilla adapter for the Vercel AI SDK — use 160+ data sources as tools.",
+  "keywords": ["katzilla", "vercel", "ai-sdk", "tools", "data", "osint"]
+}
