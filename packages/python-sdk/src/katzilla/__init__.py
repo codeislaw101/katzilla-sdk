@@ -1,14 +1,12 @@
 """Katzilla — Official Python SDK for the Katzilla Data API."""
 
-from .client import Katzilla, KatzillaApiError
+from .client import Katzilla, AsyncKatzilla, KatzillaApiError, KatzillaResponse
 from .openai_tools import as_openai_tools
-
-# OpenClaw uses the same OpenAI function calling format
-as_openclaw_tools = as_openai_tools
 
 __all__ = [
     "Katzilla",
+    "AsyncKatzilla",
     "KatzillaApiError",
+    "KatzillaResponse",
     "as_openai_tools",
-    "as_openclaw_tools",
 ]

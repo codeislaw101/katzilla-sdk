@@ -1,0 +1,30 @@
+{
+  "name": "@katzilla/mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MCP server for Katzilla — 300+ data sources for Claude Desktop, Cursor, and AI agents.",
+  "main": "dist/index.js",
+  "bin": {
+    "katzilla-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@katzilla/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0"
+  },
+  "files": ["dist", "README.md"],
+  "license": "MIT",
+  "keywords": ["mcp", "katzilla", "data", "claude", "cursor", "ai-agents"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codeislaw101/katzilla"
+  }
+}
