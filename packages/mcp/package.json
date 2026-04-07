@@ -21,6 +21,7 @@
     "typescript": "^5.9.0"
   },
   "files": ["dist", "README.md"],
+  "mcpName": "io.github.codeislaw101/katzilla",
   "license": "MIT",
   "keywords": ["mcp", "katzilla", "data", "claude", "cursor", "ai-agents"],
   "repository": {
