@@ -132,4 +132,81 @@ export class Katzilla {
     const actionId = toolName.slice(sepIdx + 2);
     return this.execute<T>(agentHandle, actionId, args);
   }
+
+  // ── Support Tickets ──────────────────────────────────────────
+
+  /** Support ticket management. */
+  support = {
+    /**
+     * Create a support ticket.
+     *
+     *   await kz.support.createTicket({ subject: "Bug report", description: "Details..." });
+     */
+    createTicket: async (opts: {
+      subject: string;
+      description: string;
+      category?: "general" | "billing" | "bug" | "feature" | "api" | "account";
+      priority?: "low" | "normal" | "high" | "urgent";
+    }): Promise<{ id: string; status: string }> => {
+      const body = {
+        ...opts,
+        description: `${opts.description}\n\n---\n_Filed via Katzilla TypeScript SDK_`,
+      };
+      return this._supportRequest("POST", "/support/tickets", body);
+    },
+
+    /**
+     * List your support tickets.
+     */
+    listTickets: async (opts?: { status?: string; page?: number }): Promise<{ tickets: SupportTicket[] }> => {
+      const params = new URLSearchParams();
+      if (opts?.status) params.set("status", opts.status);
+      if (opts?.page) params.set("page", String(opts.page));
+      const qs = params.toString();
+      return this._supportRequest("GET", `/support/tickets${qs ? `?${qs}` : ""}`);
+    },
+
+    /**
+     * Get a single ticket with its full conversation.
+     */
+    getTicket: async (id: string): Promise<SupportTicketDetail> => {
+      return this._supportRequest("GET", `/support/tickets/${id}`);
+    },
+
+    /**
+     * Reply to a support ticket.
+     */
+    reply: async (id: string, message: string): Promise<{ id: string }> => {
+      return this._supportRequest("POST", `/support/tickets/${id}/replies`, { body: message });
+    },
+  };
+
+  private async _supportRequest<T>(method: string, path: string, body?: object): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = { "X-API-Key": this.apiKey };
+    const init: RequestInit = { method, headers };
+    if (body) {
+      headers["Content-Type"] = "application/json";
+      init.body = JSON.stringify(body);
+    }
+    const res = await fetch(url, init);
+    const json = await res.json();
+    if (!res.ok) throw new KatzillaApiError(res.status, json as KatzillaError);
+    return json as T;
+  }
+}
+
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  status: string;
+  priority: string;
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SupportTicketDetail extends SupportTicket {
+  description: string;
+  replies: Array<{ id: string; authorRole: string; body: string; createdAt: string }>;
 }

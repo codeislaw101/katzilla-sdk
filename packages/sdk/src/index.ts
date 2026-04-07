@@ -9,5 +9,5 @@
  */
 
 export { Katzilla, KatzillaApiError } from "./client.js";
-export type { KatzillaOptions } from "./client.js";
+export type { KatzillaOptions, SupportTicket, SupportTicketDetail } from "./client.js";
 export type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool } from "./types.js";

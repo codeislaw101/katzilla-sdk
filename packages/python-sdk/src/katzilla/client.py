@@ -203,6 +203,66 @@ class Katzilla:
             raise KatzillaApiError(resp.status_code, body)
         return body
 
+    # ── Support Tickets ──────────────────────────────────────
+
+    def create_ticket(
+        self,
+        subject: str,
+        description: str,
+        category: str | None = None,
+        priority: str | None = None,
+    ) -> dict[str, Any]:
+        """Create a support ticket.
+
+        Args:
+            subject: Ticket subject line.
+            description: Detailed description of the issue.
+            category: One of: general, billing, bug, feature, api, account.
+            priority: One of: low, normal, high, urgent.
+        """
+        body: dict[str, Any] = {
+            "subject": subject,
+            "description": f"{description}\n\n---\n_Filed via Katzilla Python SDK_",
+        }
+        if category:
+            body["category"] = category
+        if priority:
+            body["priority"] = priority
+        resp = self._request_with_retry("POST", f"{self._base_url}/support/tickets", json=body)
+        data = resp.json()
+        if resp.status_code >= 400:
+            raise KatzillaApiError(resp.status_code, data)
+        return data
+
+    def list_tickets(self, status: str | None = None) -> list[dict[str, Any]]:
+        """List your support tickets."""
+        params: dict[str, str] = {}
+        if status:
+            params["status"] = status
+        resp = self._request_with_retry("GET", f"{self._base_url}/support/tickets", params=params)
+        data = resp.json()
+        if resp.status_code >= 400:
+            raise KatzillaApiError(resp.status_code, data)
+        return data.get("tickets", [])
+
+    def get_ticket(self, ticket_id: str) -> dict[str, Any]:
+        """Get a single ticket with its full conversation."""
+        resp = self._request_with_retry("GET", f"{self._base_url}/support/tickets/{ticket_id}")
+        data = resp.json()
+        if resp.status_code >= 400:
+            raise KatzillaApiError(resp.status_code, data)
+        return data
+
+    def reply_to_ticket(self, ticket_id: str, body: str) -> dict[str, Any]:
+        """Reply to a support ticket."""
+        resp = self._request_with_retry(
+            "POST", f"{self._base_url}/support/tickets/{ticket_id}/replies", json={"body": body}
+        )
+        data = resp.json()
+        if resp.status_code >= 400:
+            raise KatzillaApiError(resp.status_code, data)
+        return data
+
     def join(
         self,
         sources: list[dict[str, Any]],
@@ -328,6 +388,43 @@ class AsyncKatzilla:
         agent = tool_name[:sep_idx]
         action = tool_name[sep_idx + 2:]
         return await self.query(agent, action, args)
+
+    # ── Support Tickets (async) ─────────────────────────────
+
+    async def create_ticket(
+        self, subject: str, description: str, category: str | None = None, priority: str | None = None
+    ) -> dict[str, Any]:
+        """Create a support ticket (async)."""
+        body: dict[str, Any] = {"subject": subject, "description": f"{description}\n\n---\n_Filed via Katzilla Python SDK_"}
+        if category: body["category"] = category
+        if priority: body["priority"] = priority
+        resp = await self._request_with_retry("POST", f"{self._base_url}/support/tickets", json=body)
+        data = resp.json()
+        if resp.status_code >= 400: raise KatzillaApiError(resp.status_code, data)
+        return data
+
+    async def list_tickets(self, status: str | None = None) -> list[dict[str, Any]]:
+        """List your support tickets (async)."""
+        params: dict[str, str] = {}
+        if status: params["status"] = status
+        resp = await self._request_with_retry("GET", f"{self._base_url}/support/tickets", params=params)
+        data = resp.json()
+        if resp.status_code >= 400: raise KatzillaApiError(resp.status_code, data)
+        return data.get("tickets", [])
+
+    async def get_ticket(self, ticket_id: str) -> dict[str, Any]:
+        """Get a single ticket with conversation (async)."""
+        resp = await self._request_with_retry("GET", f"{self._base_url}/support/tickets/{ticket_id}")
+        data = resp.json()
+        if resp.status_code >= 400: raise KatzillaApiError(resp.status_code, data)
+        return data
+
+    async def reply_to_ticket(self, ticket_id: str, body: str) -> dict[str, Any]:
+        """Reply to a support ticket (async)."""
+        resp = await self._request_with_retry("POST", f"{self._base_url}/support/tickets/{ticket_id}/replies", json={"body": body})
+        data = resp.json()
+        if resp.status_code >= 400: raise KatzillaApiError(resp.status_code, data)
+        return data
 
     async def join(
         self,
