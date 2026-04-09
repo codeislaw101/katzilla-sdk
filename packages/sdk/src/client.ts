@@ -6,7 +6,7 @@
  *   const quakes = await kz.agent("data-hazards").action("recent-earthquakes", { minMagnitude: 5 });
  */
 
-import type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool } from "./types.js";
+import type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool, TokenOptimizationParams } from "./types.js";
 
 export interface KatzillaOptions {
   /** API key (starts with kz_) */
@@ -38,14 +38,25 @@ export class Katzilla {
    * Query a data source by agent handle + action ID.
    *
    *   const quakes = await kz.query("hazards", "usgs-earthquakes", { minMagnitude: 5 });
+   *
+   *   // With token optimization:
+   *   const gdp = await kz.query("economic", "fred-series", { seriesId: "GDP" }, {
+   *     _fields: ["date", "value"],
+   *     _limit: 10,
+   *     _format: "compact",
+   *     _normalize: true,
+   *     _units: "metric",
+   *   });
    */
   query<T = Record<string, unknown>>(
     agentHandle: string,
     actionId: string,
     input: Record<string, unknown> = {},
+    options?: Partial<TokenOptimizationParams>,
   ): Promise<KatzillaResponse<T>> {
     const handle = agentHandle.replace(/^katzilla-/, "");
-    return this.execute<T>(handle, actionId, input);
+    const merged = options ? { ...input, ...options } : input;
+    return this.execute<T>(handle, actionId, merged);
   }
 
   /**

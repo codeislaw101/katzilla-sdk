@@ -11,6 +11,8 @@ export interface QualityMeta {
   last_verified: string | null;
   data_completeness: number;
   confidence: "high" | "medium" | "low";
+  /** Truth Engine numeric certainty score (0.000 – 1.000) */
+  certainty_score: number;
 }
 
 export interface CitationBlock {
@@ -27,7 +29,11 @@ export interface TokenOptimizationParams {
   _fields?: string[];
   _format?: "full" | "compact";
   _limit?: number;
+  _page?: number;
+  _normalize?: boolean;
+  _units?: "metric" | "imperial";
   _summary?: boolean;
+  _mock?: boolean;
 }
 
 // ── API Response ───────────────────────────────────────────────
@@ -41,7 +47,9 @@ export interface KatzillaResponse<T = Record<string, unknown>> {
     action: string;
     authMethod: string;
     creditsCharged: number;
-    cacheStatus: "hit" | "miss" | "stale";
+    cacheStatus: "hit" | "miss" | "stale" | "mock";
+    /** True when served from cache — no quota charged */
+    cachedFree?: boolean;
     durationMs: number;
   };
   quality: QualityMeta;

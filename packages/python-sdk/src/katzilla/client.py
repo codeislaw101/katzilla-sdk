@@ -133,6 +133,10 @@ class Katzilla:
         fields: list[str] | None = None,
         format: str | None = None,
         limit: int | None = None,
+        page: int | None = None,
+        normalize: bool = False,
+        units: str | None = None,
+        summary: bool = False,
         mock: bool = False,
     ) -> KatzillaResponse:
         """Execute a data agent action.
@@ -144,6 +148,10 @@ class Katzilla:
             fields: Filter response to only these fields (_fields).
             format: Response format - "full" or "compact" (_format).
             limit: Limit array results (_limit).
+            page: Page number for paginated results, starts at 1 (_page).
+            normalize: Rename inconsistent field names to canonical forms (_normalize).
+            units: Convert units - "metric" or "imperial" (_units).
+            summary: Include aggregate stats (count, min, max, avg) for numeric fields (_summary).
             mock: Return cached sample data instead of hitting upstream (_mock).
 
         Returns:
@@ -159,6 +167,14 @@ class Katzilla:
             body["_format"] = format
         if limit:
             body["_limit"] = limit
+        if page:
+            body["_page"] = page
+        if normalize:
+            body["_normalize"] = True
+        if units:
+            body["_units"] = units
+        if summary:
+            body["_summary"] = True
         if mock:
             body["_mock"] = True
 
@@ -348,6 +364,10 @@ class AsyncKatzilla:
         fields: list[str] | None = None,
         format: str | None = None,
         limit: int | None = None,
+        page: int | None = None,
+        normalize: bool = False,
+        units: str | None = None,
+        summary: bool = False,
         mock: bool = False,
     ) -> KatzillaResponse:
         """Execute a data agent action (async)."""
@@ -361,6 +381,14 @@ class AsyncKatzilla:
             body["_format"] = format
         if limit:
             body["_limit"] = limit
+        if page:
+            body["_page"] = page
+        if normalize:
+            body["_normalize"] = True
+        if units:
+            body["_units"] = units
+        if summary:
+            body["_summary"] = True
         if mock:
             body["_mock"] = True
 
