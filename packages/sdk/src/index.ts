@@ -10,4 +10,4 @@
 
 export { Katzilla, KatzillaApiError } from "./client.js";
 export type { KatzillaOptions, SupportTicket, SupportTicketDetail } from "./client.js";
-export type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool } from "./types.js";
+export type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool, ScrapeFormat, ScrapeEngine, ScrapePageOptions, ScrapeResponse, ScrapePageData, ScrapeMetadata, ScrapeLink } from "./types.js";

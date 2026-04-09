@@ -6,7 +6,7 @@
  *   const quakes = await kz.agent("data-hazards").action("recent-earthquakes", { minMagnitude: 5 });
  */
 
-import type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool, TokenOptimizationParams } from "./types.js";
+import type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool, TokenOptimizationParams, ScrapePageOptions, ScrapeResponse } from "./types.js";
 
 export interface KatzillaOptions {
   /** API key (starts with kz_) */
@@ -191,6 +191,35 @@ export class Katzilla {
       return this._supportRequest("POST", `/support/tickets/${id}/replies`, { body: message });
     },
   };
+
+  // ── Web Scraping ─────────────────────────────────────────────
+
+  /** Web scraping API powered by Crawlee. */
+  scrape = {
+    /**
+     * Scrape a single page and return clean content.
+     *
+     *   const page = await kz.scrape.page("https://example.com");
+     *   console.log(page.data.content); // markdown
+     *
+     *   const html = await kz.scrape.page("https://example.com", { format: "html" });
+     */
+    page: async (url: string, options?: ScrapePageOptions): Promise<ScrapeResponse> => {
+      return this._scrapeRequest<ScrapeResponse>("POST", "/scrape/page", { url, ...options });
+    },
+  };
+
+  private async _scrapeRequest<T>(method: string, path: string, body?: object): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      "X-API-Key": this.apiKey,
+      "Content-Type": "application/json",
+    };
+    const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    const json = await res.json();
+    if (!res.ok) throw new KatzillaApiError(res.status, json as KatzillaError);
+    return json as T;
+  }
 
   private async _supportRequest<T>(method: string, path: string, body?: object): Promise<T> {
     const url = `${this.baseUrl}${path}`;

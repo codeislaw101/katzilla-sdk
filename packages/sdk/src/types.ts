@@ -81,3 +81,59 @@ export interface OpenAIFunctionTool {
     parameters: Record<string, unknown>;
   };
 }
+
+// ── Scrape Types ──────────────────────────────────────────────
+
+export type ScrapeFormat = "markdown" | "html" | "text";
+export type ScrapeEngine = "http" | "browser";
+
+export interface ScrapePageOptions {
+  /** Output format (default: "markdown") */
+  format?: ScrapeFormat;
+  /** CSS selector to extract a specific element */
+  selector?: string;
+  /** CSS selector to wait for (browser engine only) */
+  waitFor?: string;
+  /** Force engine selection (default: "http") */
+  engine?: ScrapeEngine;
+  /** Request timeout in ms (default: 30000) */
+  timeout?: number;
+  /** Custom request headers */
+  headers?: Record<string, string>;
+}
+
+export interface ScrapeMetadata {
+  title: string | null;
+  description: string | null;
+  url: string;
+  statusCode: number;
+  loadTimeMs: number;
+  engine: ScrapeEngine;
+  contentLength: number;
+}
+
+export interface ScrapeLink {
+  text: string;
+  href: string;
+}
+
+export interface ScrapePageData {
+  content: string;
+  metadata: ScrapeMetadata;
+  links: ScrapeLink[];
+}
+
+export interface ScrapeResponse {
+  success: boolean;
+  data: ScrapePageData;
+  meta: {
+    agent: "scrape";
+    action: string;
+    engine: ScrapeEngine;
+    creditsCharged: number;
+    cacheStatus: "hit" | "miss";
+    cachedFree: boolean;
+    durationMs: number;
+  };
+  citation?: CitationBlock;
+}
