@@ -20,8 +20,9 @@
  *   }
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { Katzilla } from "@katzilla/sdk";
 
 const API_KEY = process.env.KATZILLA_API_KEY;
@@ -35,43 +36,47 @@ const BASE_URL = process.env.KATZILLA_BASE_URL || "https://api.katzilla.dev";
 
 async function main() {
   const kz = new Katzilla({ apiKey: API_KEY!, baseUrl: BASE_URL });
-
-  // Fetch tool definitions from the API
   const toolDefs = await kz.getTools();
 
-  const server = new McpServer({
-    name: "katzilla",
-    version: "0.1.0",
+  // Build a quick lookup so CallTool doesn't re-scan the list.
+  const byName = new Map(toolDefs.map((t) => [t.name, t]));
+
+  const server = new Server(
+    { name: "katzilla", version: "0.1.1" },
+    { capabilities: { tools: {} } },
+  );
+
+  // Katzilla's /agents/tools returns JSON Schema, which is exactly what the
+  // MCP tools/list response expects — hand it through directly instead of
+  // going via McpServer.tool(), which wants Zod shapes.
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: toolDefs.map((t) => ({
+      name: t.name,
+      description: t.description,
+      inputSchema: t.inputSchema as Record<string, unknown>,
+    })),
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (req) => {
+    const { name, arguments: args = {} } = req.params;
+    if (!byName.has(name)) {
+      return {
+        content: [{ type: "text" as const, text: `Error: unknown tool "${name}"` }],
+        isError: true,
+      };
+    }
+    try {
+      const result = await kz.executeToolCall(name, args as Record<string, unknown>);
+      const payload = { data: result.data, quality: result.quality, citation: result.citation };
+      return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }] };
+    } catch (err: any) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err.message}` }],
+        isError: true,
+      };
+    }
   });
 
-  // Register each Katzilla tool as an MCP tool
-  for (const tool of toolDefs) {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema as Record<string, unknown>,
-      async (args: Record<string, unknown>) => {
-        try {
-          const result = await kz.executeToolCall(tool.name, args);
-          const payload = {
-            data: result.data,
-            quality: result.quality,
-            citation: result.citation,
-          };
-          return {
-            content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }],
-          };
-        } catch (err: any) {
-          return {
-            content: [{ type: "text" as const, text: `Error: ${err.message}` }],
-            isError: true,
-          };
-        }
-      },
-    );
-  }
-
-  // Connect via stdio transport
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
