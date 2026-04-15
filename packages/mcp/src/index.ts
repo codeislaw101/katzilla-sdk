@@ -25,24 +25,21 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { Katzilla } from "@katzilla/sdk";
 
-const API_KEY = process.env.KATZILLA_API_KEY;
-if (!API_KEY) {
-  console.error("Error: KATZILLA_API_KEY environment variable is required.");
-  console.error("Get your free API key at https://katzilla.dev/dashboard");
-  process.exit(1);
-}
-
+// The key is optional at startup so indexers and MCP inspectors (e.g. Glama)
+// can register tools without provisioning an env var — /agents/tools is a
+// public endpoint. We only refuse tool calls if the key is missing.
+const API_KEY = process.env.KATZILLA_API_KEY ?? "";
 const BASE_URL = process.env.KATZILLA_BASE_URL || "https://api.katzilla.dev";
 
 async function main() {
-  const kz = new Katzilla({ apiKey: API_KEY!, baseUrl: BASE_URL });
+  const kz = new Katzilla({ apiKey: API_KEY, baseUrl: BASE_URL });
   const toolDefs = await kz.getTools();
 
   // Build a quick lookup so CallTool doesn't re-scan the list.
   const byName = new Map(toolDefs.map((t) => [t.name, t]));
 
   const server = new Server(
-    { name: "katzilla", version: "0.1.1" },
+    { name: "katzilla", version: "0.1.3" },
     { capabilities: { tools: {} } },
   );
 
@@ -62,6 +59,15 @@ async function main() {
     if (!byName.has(name)) {
       return {
         content: [{ type: "text" as const, text: `Error: unknown tool "${name}"` }],
+        isError: true,
+      };
+    }
+    if (!API_KEY) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: "Error: KATZILLA_API_KEY is not set. Get a free key at https://katzilla.dev/dashboard and add it to your MCP client's env config.",
+        }],
         isError: true,
       };
     }
