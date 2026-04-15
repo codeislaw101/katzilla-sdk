@@ -69,8 +69,14 @@ export interface KatzillaToolDefinition {
   name: string;
   agentHandle: string;
   actionId: string;
+  /** Short human-readable title (MCP 2025-03-26). */
+  title?: string;
   description: string;
   inputSchema: Record<string, unknown>;
+  /** JSON Schema for the response envelope (MCP 2025-03-26). */
+  outputSchema?: Record<string, unknown>;
+  /** MCP tool annotations — readOnlyHint, idempotentHint, openWorldHint, title, etc. */
+  annotations?: Record<string, unknown>;
 }
 
 export interface OpenAIFunctionTool {

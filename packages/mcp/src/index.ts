@@ -39,7 +39,7 @@ async function main() {
   const byName = new Map(toolDefs.map((t) => [t.name, t]));
 
   const server = new Server(
-    { name: "katzilla", version: "0.1.3" },
+    { name: "katzilla", version: "0.1.4" },
     { capabilities: { tools: {} } },
   );
 
@@ -49,8 +49,11 @@ async function main() {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: toolDefs.map((t) => ({
       name: t.name,
+      ...(t.title ? { title: t.title } : {}),
       description: t.description,
       inputSchema: t.inputSchema as Record<string, unknown>,
+      ...(t.outputSchema ? { outputSchema: t.outputSchema } : {}),
+      ...(t.annotations ? { annotations: t.annotations } : {}),
     })),
   }));
 
