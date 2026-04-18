@@ -14,6 +14,7 @@ This repo contains the **client-side pieces** (SDKs and MCP server). The API bac
 | [`@katzilla/mcp`](./packages/mcp) | [npm](https://www.npmjs.com/package/@katzilla/mcp) | Model Context Protocol server for Claude Desktop, Cursor, Windsurf, etc. |
 | [`@katzilla/ai-sdk`](./packages/ai-sdk) | [npm](https://www.npmjs.com/package/@katzilla/ai-sdk) | Adapter for [Vercel AI SDK](https://sdk.vercel.ai) `tools` |
 | [`katzilla`](./packages/python-sdk) (Python) | [PyPI](https://pypi.org/project/katzilla/) | Python client |
+| [`katzilla-langchain`](./packages/python-langchain) (Python) | [PyPI](https://pypi.org/project/katzilla-langchain/) | LangChain tools adapter |
 
 ## Quick start
 
@@ -85,6 +86,19 @@ from katzilla import Katzilla
 kz = Katzilla(api_key="kz_...")
 resp = kz.query("hazards", "usgs-earthquakes", min_magnitude=5)
 print(resp["data"], resp["citation"])
+```
+
+### LangChain
+
+```bash
+pip install katzilla-langchain
+```
+
+```python
+from katzilla_langchain import get_katzilla_tools
+
+tools = get_katzilla_tools(api_key="kz_...")
+# Pass `tools` to any LangChain agent.
 ```
 
 ## Developing locally
