@@ -1,22 +1,22 @@
 # @katzilla/mcp
 
 [![npm](https://img.shields.io/npm/v/@katzilla/mcp.svg)](https://www.npmjs.com/package/@katzilla/mcp)
-[![license](https://img.shields.io/npm/l/@katzilla/mcp.svg)](https://github.com/codeislaw101/katzilla/blob/master/LICENSE)
+[![license](https://img.shields.io/npm/l/@katzilla/mcp.svg)](https://github.com/codeislaw101/katzilla-sdk/blob/master/LICENSE)
 
-Model Context Protocol server for [Katzilla](https://katzilla.dev) — 300+ free public and government data sources behind one API key, exposed as MCP tools for Claude Desktop, Cursor, and any other MCP client.
+Model Context Protocol server for [Katzilla](https://katzilla.dev) — every major US government source plus 15+ international open-data portals behind one API key, exposed as MCP tools for Claude Desktop, Cursor, and any other MCP client.
 
 ## What you get
 
-One MCP server, one API key, and live access to primary-source data across:
+One MCP server, one API key, and live access to primary-source government data across:
 
-- **US federal** — congress.gov, SEC EDGAR, Federal Register, Regulations.gov, USAspending, FEC, govinfo, State Department
+- **US federal** — Congress.gov, SEC EDGAR, Federal Register, Regulations.gov, USAspending, FEC, GovInfo, State Department
 - **US case law** — CourtListener (opinions at every level)
-- **US health** — FDA recalls / adverse events / devices, NIH ClinicalTrials.gov, CMS, CDC
+- **US health** — FDA recalls / adverse events / devices, NIH ClinicalTrials.gov, CMS, CDC, NPPES NPI
 - **US hazards** — USGS earthquakes & water, NWS alerts, FEMA disasters, NASA FIRMS wildfires
-- **Economics** — BLS, FRED, BEA, Census ACS, Treasury Fiscal Data
-- **International** — 17+ open-data portals (UK, France, Germany, Canada, Australia, Brazil, Ireland, Spain, Italy, Poland, …)
-- **Bodies** — Eurostat, ECB, WHO, OECD, IMF, World Bank, UN Comtrade, SIPRI
-- …plus crypto, space, demographics, energy, transport, agriculture.
+- **US economics** — BLS, FRED, BEA, Census ACS, Treasury Fiscal Data
+- **International bodies** — Eurostat, ECB, WHO, OECD, IMF, World Bank, UN Comtrade, SIPRI, WTO
+- **National open-data portals** — UK, France, Germany, Italy, Netherlands, Australia, Canada, Brazil, Ireland, Spain, Poland, Finland, Portugal, plus city portals (Istanbul, Gdansk, Lviv, Queensland)
+- …plus agencies for agriculture (USDA), energy (EIA, NREL), consumer protection (CFPB, FTC, CPSC), patents (USPTO), transport (NHTSA, BTS), and more.
 
 Every response carries a `citation` block (source, license, URL, update frequency) and a `quality` block (freshness, uptime, completeness, confidence). Results are grounded and auditable.
 
@@ -85,10 +85,11 @@ On start, the server calls Katzilla's public `/agents/tools` endpoint and regist
 
 ## Links
 
-- Katzilla API — <https://katzilla.dev>
+- Katzilla — <https://katzilla.dev>
 - API key & dashboard — <https://katzilla.dev/dashboard>
-- Main repository — <https://github.com/codeislaw101/katzilla>
-- Issues — <https://github.com/codeislaw101/katzilla/issues>
+- API docs — <https://katzilla.dev/docs>
+- SDK + MCP repository — <https://github.com/codeislaw101/katzilla-sdk>
+- Issues — <https://github.com/codeislaw101/katzilla-sdk/issues>
 
 ## License
 

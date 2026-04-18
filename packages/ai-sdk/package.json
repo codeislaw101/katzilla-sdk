@@ -34,6 +34,15 @@
   },
   "files": ["dist", "README.md"],
   "license": "MIT",
-  "description": "Katzilla adapter for the Vercel AI SDK — use 160+ data sources as tools.",
-  "keywords": ["katzilla", "vercel", "ai-sdk", "tools", "data", "osint"]
+  "description": "Katzilla adapter for the Vercel AI SDK — government-data tools for AI agents.",
+  "keywords": ["katzilla", "vercel", "ai-sdk", "tools", "government-data", "ai-agents"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codeislaw101/katzilla-sdk",
+    "directory": "packages/ai-sdk"
+  },
+  "homepage": "https://katzilla.dev",
+  "bugs": {
+    "url": "https://github.com/codeislaw101/katzilla-sdk/issues"
+  }
 }

@@ -2,7 +2,7 @@
   "name": "@katzilla/mcp",
   "version": "0.1.4",
   "type": "module",
-  "description": "MCP server for Katzilla — 300+ data sources for Claude Desktop, Cursor, and AI agents.",
+  "description": "MCP server for Katzilla — the government-data backbone for AI agents. Claude Desktop, Cursor, Windsurf, and any MCP client.",
   "main": "dist/index.js",
   "bin": {
     "katzilla-mcp": "dist/index.js"
@@ -22,11 +22,16 @@
     "typescript": "^5.9.0"
   },
   "files": ["dist", "README.md"],
-  "mcpName": "io.github.codeislaw101/katzilla",
+  "mcpName": "io.github.codeislaw101/katzilla-sdk",
   "license": "MIT",
-  "keywords": ["mcp", "katzilla", "data", "claude", "cursor", "ai-agents"],
+  "keywords": ["mcp", "katzilla", "government-data", "claude", "cursor", "windsurf", "ai-agents"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/codeislaw101/katzilla"
+    "url": "https://github.com/codeislaw101/katzilla-sdk",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://katzilla.dev",
+  "bugs": {
+    "url": "https://github.com/codeislaw101/katzilla-sdk/issues"
   }
 }

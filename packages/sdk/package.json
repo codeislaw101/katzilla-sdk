@@ -21,10 +21,15 @@
   },
   "files": ["dist", "README.md"],
   "license": "MIT",
-  "description": "Official TypeScript SDK for the Katzilla Data API — free OSINT & public data.",
-  "keywords": ["katzilla", "api", "data", "osint", "government", "sdk"],
+  "description": "Official TypeScript SDK for Katzilla — the government-data backbone for AI agents.",
+  "keywords": ["katzilla", "api", "government-data", "public-data", "ai-agents", "sdk"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/codeislaw101/katzilla"
+    "url": "https://github.com/codeislaw101/katzilla-sdk",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://katzilla.dev",
+  "bugs": {
+    "url": "https://github.com/codeislaw101/katzilla-sdk/issues"
   }
 }
