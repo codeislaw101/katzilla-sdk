@@ -7,6 +7,14 @@
  */
 
 import type { KatzillaResponse, KatzillaError, KatzillaToolDefinition, OpenAIFunctionTool, TokenOptimizationParams, ScrapePageOptions, ScrapeResponse } from "./types.js";
+import type {
+  DatasetMetadata,
+  GetParsedOptions,
+  PagesUsageResponse,
+  ParsedDatasetResponse,
+  SearchOptions,
+  SearchResult,
+} from "./datasets.js";
 
 export interface KatzillaOptions {
   /** API key (starts with kz_) */
@@ -191,6 +199,97 @@ export class Katzilla {
       return this._supportRequest("POST", `/support/tickets/${id}/replies`, { body: message });
     },
   };
+
+  // ── Web Scraping ─────────────────────────────────────────────
+
+  // ── Datasets (v2 unified data.gov catalog) ──────────────────
+
+  /**
+   * Datasets API — discovery + retrieval over the 526K-dataset unified
+   * catalog. See packages/sdk/src/datasets.ts for pricing + billing
+   * model notes.
+   */
+  datasets = {
+    /** Full-text search over the catalog. 1 API call. */
+    search: async (opts: SearchOptions = {}): Promise<SearchResult> => {
+      const qs = new URLSearchParams();
+      for (const [k, v] of Object.entries(opts)) {
+        if (v === undefined || v === null || v === "") continue;
+        qs.set(k, String(v));
+      }
+      return this._datasetsGet<SearchResult>(
+        `/v1/datasets/search${qs.toString() ? "?" + qs.toString() : ""}`,
+      );
+    },
+
+    /** Single-dataset metadata lookup. 1 API call. */
+    get: async (id: string): Promise<DatasetMetadata> => {
+      return this._datasetsGet<DatasetMetadata>(
+        `/v1/datasets/${encodeURIComponent(id)}`,
+      );
+    },
+
+    /**
+     * Raw upstream byte proxy. Returns the native Response so you can
+     * stream binary. 1 API call. Citation headers on the response:
+     * X-Katzilla-Source, X-Katzilla-Modified, X-Katzilla-Upstream.
+     */
+    getFile: async (id: string): Promise<Response> => {
+      const url = `${this.baseUrl}/v1/datasets/${encodeURIComponent(id)}/file`;
+      const res = await fetch(url, { headers: { "X-API-Key": this.apiKey } });
+      if (!res.ok) {
+        let body: KatzillaError;
+        try {
+          body = (await res.json()) as KatzillaError;
+        } catch {
+          body = { error: `HTTP ${res.status}` };
+        }
+        throw new KatzillaApiError(res.status, body);
+      }
+      return res;
+    },
+
+    /**
+     * Parsed rows + columns. For already-structured datasets (~391K of
+     * the catalog), returns immediately from our parse cache. For
+     * `raw_only` datasets, pass `{ parse: true }` to run a Claude-
+     * backed extraction — this meters PAGES against your plan (see
+     * the `retrieval.parse.estimated_pages` field returned from
+     * `.get(id)` for a cost preview before opting in).
+     */
+    getParsed: async (
+      id: string,
+      opts: GetParsedOptions = {},
+    ): Promise<ParsedDatasetResponse> => {
+      const qs = new URLSearchParams();
+      if (opts.parse) qs.set("parse", "true");
+      if (opts.maxRows != null) qs.set("max_rows", String(opts.maxRows));
+      const suffix = qs.toString() ? "?" + qs.toString() : "";
+      return this._datasetsGet<ParsedDatasetResponse>(
+        `/v1/datasets/${encodeURIComponent(id)}/parsed${suffix}`,
+      );
+    },
+  };
+
+  /**
+   * Usage meter for the v2 data plan. Returns the caller's current-
+   * period page consumption. Dashboards render a progress bar from
+   * this; agents check `overage_cents_so_far` before firing off a
+   * batch of `datasets.getParsed({ parse: true })` calls.
+   */
+  usage = {
+    pages: async (): Promise<PagesUsageResponse> => {
+      return this._datasetsGet<PagesUsageResponse>("/v1/usage/pages");
+    },
+  };
+
+  private async _datasetsGet<T>(path: string): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+    const res = await fetch(url, { headers: { "X-API-Key": this.apiKey } });
+    const json = await res.json();
+    if (!res.ok) throw new KatzillaApiError(res.status, json as KatzillaError);
+    return json as T;
+  }
 
   // ── Web Scraping ─────────────────────────────────────────────
 

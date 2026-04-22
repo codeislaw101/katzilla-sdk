@@ -31,10 +31,28 @@ import { Katzilla } from "@katzilla/sdk";
 
 const kz = new Katzilla({ apiKey: process.env.KATZILLA_API_KEY! });
 
+// Agent actions
 const { data, citation } = await kz.query("hazards", "usgs-earthquakes", {
   minMagnitude: 5,
   limit: 10,
 });
+
+// Unified datasets API (v2) — search 526K data.gov datasets + on-demand parse
+const hits = await kz.datasets.search({ q: "FDA recalls", limit: 10 });
+
+// Already-structured datasets stream rows immediately:
+const rows = await kz.datasets.getParsed(hits.results[0].id);
+
+// For `raw_only` datasets (PDFs, shapefiles), request a Claude parse
+// — meters pages against your plan; check estimated_pages first:
+if (hits.results[0].retrieval.parse.available) {
+  const preview = await kz.datasets.getParsed(hits.results[0].id, { parse: true });
+  console.log(preview.text, preview.structured);
+}
+
+// Track your monthly page budget
+const usage = await kz.usage.pages();
+console.log(`${usage.pages_consumed} / ${usage.included_pages} pages this period`);
 ```
 
 ### Claude Desktop / Cursor / MCP clients
